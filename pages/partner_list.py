@@ -203,20 +203,26 @@ if open_id:
                 st.info("No contacts recorded for this partner.")
             else:
                 for c in contacts:
-                    full = f"{c.get('first_name','')} {c.get('last_name','')}".strip()
-                    pos  = c.get("position","")
-                    bg2  = D["bg2"]; border = D["border"]
-                    _bg2 = D["bg2"]; _border = D["border"]
-            _muted = D["muted"]; _txt = D["text"]; _acc = D["accent"]
-            _li_url = f"https://linkedin.com/in/{c.get('linkedin','').lstrip('@')}"
-            _li_html = f"  <a href='{_li_url}' target='_blank' style='color:{_acc};font-size:0.8rem'>LinkedIn</a>" if c.get("linkedin") else ""
-            _pos_html = f" · <span style='color:{_muted};font-size:0.85rem'>{pos}</span>" if pos else ""
-            _sub = ("📧 " + c.get("email","") + "  " if c.get("email") else "") + ("📱 " + c.get("mobile","") if c.get("mobile") else "")
-            st.markdown(
+                    full    = f"{c.get('first_name','')} {c.get('last_name','')}".strip()
+                    pos     = c.get("position","")
+                    _muted  = D["muted"]
+                    _txt    = D["text"]
+                    _acc    = D["accent"]
+                    _bg2    = D["bg2"]
+                    _border = D["border"]
+                    _li_url  = f"https://linkedin.com/in/{c.get('linkedin','').lstrip('@')}"
+                    _li_html = (f"  <a href='{_li_url}' target='_blank' "
+                                f"style='color:{_acc};font-size:0.8rem'>LinkedIn</a>"
+                                if c.get("linkedin") else "")
+                    _pos_html = (f" · <span style='color:{_muted};"
+                                 f"font-size:0.85rem'>{pos}</span>" if pos else "")
+                    _sub = (("📧 " + c.get("email","") + "  ") if c.get("email") else "") + \
+                           (("📱 " + c.get("mobile","")) if c.get("mobile") else "")
+                    st.markdown(
                         f"<div style='background:{_bg2};border:1px solid {_border};"
                         f"border-radius:10px;padding:0.8rem 1rem;margin-bottom:0.5rem'>"
                         f"<strong style='color:{_txt}'>{full}</strong>{_pos_html}"
-                        f"<br><span style='color:{_muted};font-size:0.82rem'>{_sub}</span>{_li_html}"
-                        f"</div>",
+                        f"<br><span style='color:{_muted};font-size:0.82rem'>{_sub}</span>"
+                        f"{_li_html}</div>",
                         unsafe_allow_html=True
                     )
