@@ -120,35 +120,46 @@ color_discrete = {
 }
 
 def _build_map(scope: str, height: int) -> go.Figure:
-    fig = px.choropleth(
-        map_df,
-        locations="iso",
-        locationmode="ISO-3",
-        color="level",
-        color_discrete_map=color_discrete,
-        hover_name="country",
-        hover_data={"iso": False, "color_val": False, "level": False,
-                    "n_partners": True, "partner_list": True},
-        labels={"n_partners": "Partners", "partner_list": "Partner list"},
-    )
-    fig.update_traces(
-        hovertemplate=(
-            "<b>%{hovertext}</b><br>"
-            "Partners: %{customdata[0]}<br>"
-            "%{customdata[1]}<extra></extra>"
-        )
-    )
-    fig.update_geos(
+    fig = go.Figure()
+
+    # One trace per involvement level for clean coloring
+    for level, color in color_discrete.items():
+        sub = map_df[map_df["level"] == level]
+        if sub.empty:
+            continue
+        fig.add_trace(go.Choropleth(
+            locations=sub["iso"],
+            z=[1] * len(sub),
+            text=sub["country"],
+            customdata=sub[["n_partners", "partner_list"]].values,
+            colorscale=[[0, color], [1, color]],
+            showscale=False,
+            marker_line_color="rgba(255,255,255,0.2)",
+            marker_line_width=0.5,
+            hovertemplate=(
+                "<b>%{text}</b><br>"
+                "Partners: %{customdata[0]}<br>"
+                "%{customdata[1]}<extra></extra>"
+            ),
+            name=level,
+        ))
+
+    geo_settings = dict(
         scope=scope,
-        showcoastlines=True,   coastlinecolor="rgba(255,255,255,0.2)",
-        showborder=True,       bordercolor="rgba(255,255,255,0.15)",
-        showland=True,         landcolor="#1a2235",
-        showocean=True,        oceancolor="#0f1421",
-        showlakes=True,        lakecolor="#0f1421",
+        showcoastlines=True,
+        coastlinecolor="rgba(255,255,255,0.15)",
+        showland=True,
+        landcolor="#1a2235",
+        showocean=True,
+        oceancolor="#0f1421",
         showframe=False,
+        showcountries=True,
+        countrycolor="rgba(255,255,255,0.1)",
         bgcolor="rgba(0,0,0,0)",
     )
+
     fig.update_layout(
+        geo=geo_settings,
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         height=height,
